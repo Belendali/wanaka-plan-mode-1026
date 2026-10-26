@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wanaka · Plan mode · 1026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Bitcount+Grid+Single:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/studio.css">
+<link rel="stylesheet" href="css/scene.css">
+<link rel="stylesheet" href="css/console.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ── the sidebar, on every screen ─────────────────────────── -->
+  <nav class="side">
+    <div class="side__top">
+      <div class="side__brand">
+        <img class="side__logo" src="assets/icon/logo.svg" alt="Wanaka" width="94" height="20">
+        <button class="side__collapse" aria-label="Collapse sidebar"><img src="assets/icon/sidebar-toggle.svg" alt="" width="16" height="16"></button>
+      </div>
+      <ul class="nav">
+        <li><a class="nav__item is-on" href="#"><img src="assets/icon/nav-home.svg" alt="" width="16" height="16">Home</a></li>
+        <li><a class="nav__item" href="#"><img src="assets/icon/nav-game.svg" alt="" width="16" height="16">My Game</a></li>
+        <li><a class="nav__item" href="#"><img src="assets/icon/nav-character.svg" alt="" width="16" height="16">Character</a></li>
+        <li><a class="nav__item" href="#"><img src="assets/icon/nav-generator.svg" alt="" width="16" height="16">Generator</a></li>
+        <li><a class="nav__item" href="#"><img src="assets/icon/nav-play.svg" alt="" width="16" height="16">Play Games</a></li>
+      </ul>
+      <hr class="side__rule">
+      <button class="newproj" id="newProject"><span class="newproj__glow"></span><img src="assets/icon/plus-white.svg" alt="" width="14" height="14">New projects</button>
+      <p class="side__label">Recent Projects</p>
+      <ul class="recents">
+        <li><button class="recent"><img src="assets/img/recent-1.png" alt=""><span>Games nam...</span></button></li>
+        <li><button class="recent"><img src="assets/img/recent-2.png" alt=""><span>Games nam...</span></button></li>
+        <li><button class="recent"><img src="assets/img/recent-3.png" alt=""><span>Games nam...</span></button></li>
+      </ul>
+      <button class="recent recent--more">View more<img class="recent__chev" src="assets/icon/arrow-down.svg" alt="" width="16" height="16"></button>
+    </div>
+    <div class="side__bottom">
+      <a class="nav__item" href="#"><img src="assets/icon/nav-changelog.svg" alt="" width="16" height="16">Changelog</a>
+      <div class="credits">
+        <div class="credits__row"><span>40/200 Credits</span><span class="credits__up">Upgrade</span></div>
+        <div class="credits__bar"><i style="width:56.7%"></i></div>
+      </div>
+      <button class="account"><span><img src="assets/img/avatar.png" alt="" width="24" height="24">lihongfei</span><img src="assets/icon/arrow-down.svg" alt="" width="16" height="16"></button>
+    </div>
+  </nav>
+
+  <!-- ── screen 1 · home ──────────────────────────────────────── -->
+  <main class="screen screen--home is-on" id="screenHome">
+    <section class="hero">
+      <img class="hero__art" src="assets/img/hero-arcade.png" alt="">
+      <span class="hero__fade"></span>
+      <h1 class="hero__title">✨Share your brilliant idea✨</h1>
+      <form class="composer" id="composer" autocomplete="off">
+        <label class="composer__label" for="idea">Your idea</label>
+        <textarea class="composer__input" id="idea" rows="2" placeholder="Make me a jump game" spellcheck="false"></textarea>
+        <div class="composer__row">
+          <div class="composer__left">
+            <button class="iconbtn" type="button" aria-label="Attach"><img src="assets/icon/composer-plus.svg" alt="" width="16" height="16"></button>
+            <button class="model" type="button">Wanaka 1.0 Pro<img src="assets/icon/composer-arrow.svg" alt="" width="16" height="16"></button>
+          </div>
+          <div class="composer__right">
+            <!-- Plan mode: on by default -->
+            <div class="planwrap">
+              <button class="planbtn is-on" id="planBtn" type="button" aria-pressed="true">Plan mode</button>
+              <div class="plantip" role="tooltip">
+                <b>Plan mode</b>
+                <p>Wana drafts the whole plan first. Nothing gets built until you approve it.</p>
+                <em>On by default</em>
+              </div>
+            </div>
+            <button class="send" id="send" type="submit" aria-label="Send">
+              <img class="send__ring" src="assets/icon/send-circle.svg" alt="" width="32" height="32">
+              <img class="send__arrow" src="assets/icon/send-arrow.svg" alt="" width="13" height="10">
+            </button>
+          </div>
+        </div>
+      </form>
+      <div class="starters">
+        <button class="starter" type="button" data-idea="Make me a jump game"><span>🎁</span>Make me a jump game</button>
+        <button class="starter" type="button" data-idea="Make me a parkour game"><span>🏃</span>Make me a parkour game</button>
+        <button class="starter" type="button" data-idea="Make me a shooting game"><span>🔫</span>Make me a shooting game</button>
+        <button class="starter" type="button" data-idea="Make me a racing game"><span>🏎️</span>Make me a racing game</button>
+      </div>
+    </section>
+
+    <section class="browse">
+      <div class="tabs">
+        <div class="tabs__set">
+          <button class="tab is-on">All</button>
+          <button class="tab">Category</button>
+          <button class="tab">Category</button>
+          <button class="tab">Category</button>
+          <button class="tab">Category</button>
+        </div>
+        <label class="search"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m11 11 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><input type="search" placeholder="Search"></label>
+      </div>
+      <h2 class="browse__title">Trending games</h2>
+      <div class="cards" id="cards"></div>
+    </section>
+  </main>
+
+  <!-- ── screen 2 · studio, where the plan arrives ────────────── -->
+  <main class="screen screen--studio" id="screenStudio"></main>
+</div>
+
+<script src="js/scene.js"></script>
+<script src="js/data.js"></script>
+<script src="js/home.js"></script>
+<script src="js/studio.js"></script>
+<script src="js/console.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

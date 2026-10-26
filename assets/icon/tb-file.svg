@@ -1,0 +1,9 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Icon/Toolbar/File/Line" opacity="0.6">
+<path id="Vector" d="M2 3C2 2.44772 2.44772 2 3 2H11.4271L14 4.40217V13C14 13.5523 13.5523 14 13 14H3C2.44772 14 2 13.5523 2 13V3Z" stroke="white" stroke-linejoin="round"/>
+<path id="Vector_2" d="M8.00329 2L8.00052 4.46153C8.00052 4.57483 7.85129 4.66667 7.66719 4.66667H5.00052C4.81642 4.66667 4.66719 4.57483 4.66719 4.46153V2H8.00329Z" stroke="white" stroke-linejoin="round"/>
+<path id="Vector_3" d="M3 2H11.4271" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_4" d="M4.66719 8.66641H11.3339" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_5" d="M4.66719 11.3336H8.00329" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>

@@ -1,0 +1,30 @@
+/* Wanaka · the values the screens are built from (Figma: Wanaka Studio) */
+:root{
+  /* surfaces */
+  --bg:#141414;
+  --sidebar:#171717;
+  --card:#1f1f1f;
+  --chip:#232221;
+  --line:rgba(255,255,255,.08);
+  --glass:rgba(255,255,255,.06);
+  /* ink */
+  --ink:#fff;
+  --ink-60:rgba(255,255,255,.6);
+  --ink-40:rgba(255,255,255,.4);
+  --ink-on-light:#121214;
+  /* brand */
+  --lime:#C4EB00;
+  --lime-hi:#DEF86C;
+  --lime-lo:#A8C800;
+  --lime-deep:#5C7000;
+  --on-lime:#141A00;
+  --warm:linear-gradient(90deg,#FD8020 0%,#F0BA42 25%,#B9C4A5 66%);
+  /* type */
+  --sans:'Poppins',-apple-system,system-ui,sans-serif;
+  --mono:'Bitcount Grid Single',ui-monospace,monospace;
+  /* shape */
+  --r-pill:80px;
+  --r-lg:24px;
+  --r-md:16px;
+  --r-sm:8px;
+}

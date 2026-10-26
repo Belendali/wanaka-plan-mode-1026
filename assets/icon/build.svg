@@ -1,0 +1,17 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 1437256746" clip-path="url(#clip0_0_38)">
+<path id="Polygon 61" d="M7.78854 9.28883C7.52396 8.53249 8.2159 7.81033 9.00106 7.94489L9.15873 7.98329L14.2895 9.61285C15.2337 9.91274 15.2887 11.1651 14.3744 11.5395L13.2523 11.9996C12.6915 12.2291 12.2447 12.6549 12.0037 13.1893L11.5209 14.2584C11.1279 15.1295 9.81354 15.0772 9.4988 14.1775L7.78854 9.28883Z" stroke="#222222" stroke-width="1.5" stroke-linejoin="round"/>
+<circle id="Ellipse 4317" cx="2.5" cy="2.5" r="1.5" stroke="#222222" stroke-width="1.5"/>
+<circle id="Ellipse 4319" cx="2.5" cy="11.5" r="1.5" stroke="#222222" stroke-width="1.5"/>
+<path id="Vector 5362" d="M2.3762 10L2.69913 4" stroke="#222222" stroke-width="1.5"/>
+<path id="Vector 5365" d="M11.5798 4L11.7413 6.15385" stroke="#222222" stroke-width="1.5" stroke-linecap="round"/>
+<circle id="Ellipse 4318" cx="11.5" cy="2.5" r="1.5" stroke="#222222" stroke-width="1.5"/>
+<path id="Vector 5363" d="M4.31348 2.5H10.1262" stroke="#222222" stroke-width="1.5"/>
+<path id="Vector 5364" d="M4 11.5H6" stroke="#222222" stroke-width="1.5" stroke-linecap="round"/>
+</g>
+<defs>
+<clipPath id="clip0_0_38">
+<rect width="16" height="16" fill="white"/>
+</clipPath>
+</defs>
+</svg>

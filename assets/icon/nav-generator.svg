@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame" clip-path="url(#clip0_0_100)">
+<path id="Star 99" d="M7 3L7.24183 3.65353C8.11693 6.01846 9.98154 7.88307 12.3465 8.75817L13 9L12.3465 9.24183C9.98154 10.1169 8.11693 11.9815 7.24183 14.3465L7 15L6.75817 14.3465C5.88307 11.9815 4.01846 10.1169 1.65353 9.24183L1 9L1.65353 8.75817C4.01846 7.88307 5.88307 6.01846 6.75817 3.65353L7 3Z" fill="white" stroke="white" stroke-width="1.08" stroke-linejoin="round"/>
+<path id="Star 100" d="M13 0.601562L13.0967 0.862974C13.4468 1.80895 14.1926 2.55479 15.1386 2.90483L15.4 3.00156L15.1386 3.09829C14.1926 3.44834 13.4468 4.19418 13.0967 5.14015L13 5.40156L12.9033 5.14015C12.5532 4.19418 11.8074 3.44834 10.8614 3.09829L10.6 3.00156L10.8614 2.90483C11.8074 2.55479 12.5532 1.80895 12.9033 0.862974L13 0.601562Z" fill="white" stroke="white" stroke-width="0.432" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_0_100">
+<rect width="16" height="16" fill="white"/>
+</clipPath>
+</defs>
+</svg>

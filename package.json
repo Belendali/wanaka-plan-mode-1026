@@ -1,0 +1,9 @@
+{
+  "name": "wanaka-plan-mode",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plan mode: from the idea box to the plan on a handheld",
+  "scripts": {
+    "start": "python3 serve.py"
+  }
+}
