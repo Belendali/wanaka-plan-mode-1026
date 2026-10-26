@@ -8,6 +8,13 @@ const Console = (() => {
   const LOOKS = ['Stylized Toon', 'Realistic', 'Pixel', 'Low Poly', 'Graphic Ink', 'Retro Warm'];
   const QUALITY = ['Low', 'Medium', 'High', 'Ultra'];
 
+  // how each character sits in its 119.6 × 110.7 picture box (Figma's crop): width %, height %, left %, top %
+  const CROPS = [[100, 141.19, 0, -.35], [79.82, 207.93, 17.05, .49], [100, 191.22, 0, -.06], [99.26, 189.8, .56, .48],
+    [85.29, 115.21, 7.17, .68], [135.85, 208.24, -17.93, -20.14], [185.02, 231.01, -42.51, -40.59], [133.34, 159.98, -16.67, -5.34],
+    [120.67, 195.62, -25.43, -11.41], [115.54, 175.44, -7.77, -8.4], [106.18, 143.35, -3.09, -7.95], [100, 122.18, 0, .32],
+    [88.65, 129.49, 5.68, -5.83], [116.87, 134.12, -8.44, -5.05], [100, 191.22, 0, -.42], null, [100, 144.75, 0, -11.14],
+    [82.14, 118.3, 8.93, -.24], [82.59, 158.53, 8.71, -5.25], [111.34, 120.25, -5.67, -.14]];
+
   // what the Artist can pull from, per category
   const SHELVES = [
     {
@@ -15,12 +22,19 @@ const Console = (() => {
       items: ['Frost Knight', 'Ridge Scout', 'Ember Ranger', 'Skater Kid', 'Star Witch', 'Tide Mage', 'Sky Pirate',
         'Glade Elf', 'Green Archer', 'Old Captain', 'Night Detective', 'Lumber Jack', 'Wind Samurai', 'Grumpy Gramps',
         'Field Medic', 'Snow Princess', 'City Rebel', 'Moon Dancer', 'Quiet Ranger', 'Iron Viking']
-        .map((n, i) => ({ name: n, art: `${A}chars/c${String(i + 1).padStart(2, '0')}.png` })),
+        .map((n, i) => ({ name: n, art: `${A}chars/c${String(i + 1).padStart(2, '0')}.png`, crop: CROPS[i] })),
     },
     {
       key: 'scenes', name: 'Scenes', icon: 'cat-ideas.png', wide: true, crew: 'Artist',
       items: [['Red Canyon', 'canyon'], ['Spring Meadow', 'meadow'], ['Palm Beach', 'beach'], ['Deep Ocean', 'ocean'], ['Last Sunset', 'sunset']]
         .map(([n, f]) => ({ name: n, art: `${A}env/${f}.jpg` })),
+    },
+    {
+      key: 'props', name: 'Props', icon: 'cat-ideas.png', wide: true, crew: 'Artist',
+      items: [['Baseball', 'baseballs'], ['Basketball', 'basketball'], ['Book Stack', 'book-stacks'], ['Dino Plush', 'dino-suit'],
+        ['Dresser', 'dresser'], ['Pencils', 'pencils'], ['Robot Pal', 'robot-pal'], ['Star Pillow', 'stars'], ['Teddy Bear', 'teddy'],
+        ['Toy Blocks', 'toy-blocks'], ['Toy Truck', 'truck']]
+        .map(([n, f]) => ({ name: n, art: `${A}props/${f}.jpg` })),
     },
     {
       key: 'music', name: 'Music', icon: 'cat-music.png', audio: true, crew: 'Musician',
@@ -174,8 +188,8 @@ const Console = (() => {
             <div class="cats">${SHELVES.map((s, i) => `
               <button class="cat${i === 0 ? ' is-on' : ''}" type="button" data-cat="${i}">
                 <img class="cat__icon" src="${A}${s.icon}" alt="">
-                <span class="cat__row"><span class="cat__name">${s.name}</span><img class="cat__chev" src="${A}chevron-right.svg" alt=""></span>
-                <span class="cat__sub">Picked by AI</span>
+                <span class="cat__name">${s.name}</span>
+                <span class="cat__row"><span class="cat__sub">Picked by AI</span><img class="cat__chev" src="${A}arrow-right.svg" alt=""></span>
               </button>`).join('')}
             </div>
           </section>
@@ -298,7 +312,7 @@ const Console = (() => {
             <span class="track__play" role="button" aria-label="Play ${it.name}"></span>
             <span class="track__time">${clock(it.len)}</span>
           </span>` : `
-          <img class="art" src="${it.art}" alt="" loading="lazy">`;
+          ${it.crop !== undefined ? `<span class="art-box"><img class="art" src="${it.art}" alt="" loading="lazy"${it.crop ? ` style="width:${it.crop[0]}%;height:${it.crop[1]}%;left:${it.crop[2]}%;top:${it.crop[3]}%"` : ' data-fill'}></span>` : `<img class="art" src="${it.art}" alt="" loading="lazy">`}`;
     $('#pcGrid').innerHTML = items.length ? items.map((it) => `
       <button class="tile${shelf.wide ? ' tile--wide' : ''}${shelf.audio ? ' tile--audio' : ''}${picked.has(it.name) ? ' is-on' : ''}" type="button" data-name="${it.name}">
         <span class="tile__art">${art(it)}
@@ -356,9 +370,13 @@ const Console = (() => {
     $('#pcLeft').dataset.step = name;
     $$('.tab').forEach((t) => t.classList.toggle('is-on', t.dataset.tab === name));
     $$('.page').forEach((p) => p.classList.toggle('is-on', p.dataset.page === name));
-    $('#pcNext').textContent = name === 'plan' ? 'Next Assets' : 'Approve';
+    nextLabel();
     if (name === 'assets') { paintCats(); paintGrid(); } else Preview.stop();
   };
+
+  const openCat = (i) => { state.cat = i; $('#pcSearch').value = ''; paintCats(); paintGrid(); nextLabel(); };
+  const last = () => state.cat === SHELVES.length - 1;
+  const nextLabel = () => { $('#pcNext').textContent = state.step === 'plan' ? 'Next Assets' : last() ? 'Start Building' : 'Next'; };
 
   const leave = (how, then) => {
     Preview.stop();
@@ -398,6 +416,7 @@ const Console = (() => {
     $$('.tab').forEach((t) => { t.onclick = () => step(t.dataset.tab); });
     $('#pcNext').onclick = () => {
       if (state.step === 'plan') return step('assets');
+      if (!last()) return openCat(state.cat + 1);
       leave('approve', () => document.dispatchEvent(new CustomEvent('e-approved', { detail: { picks: state.picks } })));
     };
     $('#pcCancel').onclick = () => leave('cancel', () => unmount());
@@ -434,7 +453,7 @@ const Console = (() => {
     }));
 
     // categories and search
-    $$('.cat').forEach((c) => { c.onclick = () => { state.cat = +c.dataset.cat; $('#pcSearch').value = ''; paintCats(); paintGrid(); }; });
+    $$('.cat').forEach((c) => { c.onclick = () => openCat(+c.dataset.cat); });
     $('#pcSearch').oninput = paintGrid;
   };
 
