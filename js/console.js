@@ -30,6 +30,76 @@ const Console = (() => {
   ];
 
   let host = null, plan = null, timers = [];
+
+  const Keychain = (() => {
+    const TAGS = [['tag-v2-1', .524, .115, .998], ['tag-v2-2', .482, .119, .973], ['tag-v2-3', .488, .118, .996],
+      ['tag-v2-4', .473, .113, .981], ['tag-v2-5', .489, .116, 1.002]];
+    let raf = 0;
+    const start = (root) => {
+      cancelAnimationFrame(raf);
+      const kc = root.querySelector('#kc'), svg = root.querySelector('#kcChain'), charm = root.querySelector('#kcCharm'), eye = root.querySelector('#pcEye');
+      if (!kc || !eye) return;
+      kc.classList.remove('is-hidden');
+      const [f, hx, hy, ar] = TAGS[Math.floor(Math.random() * TAGS.length)];
+      charm.querySelector('img').src = `${A}tags/${f}.png`;
+      charm.style.setProperty('--hx', hx); charm.style.setProperty('--hy', hy); charm.style.setProperty('--ar', ar);
+      const N = 7, W = [0, 1, 1, 1, 1, 1, 9];
+      const P = Array.from({ length: N }, () => ({ x: 0, y: 0, px: 0, py: 0 }));
+      let seg = 9, ready = false, last = performance.now();
+      const anchor = () => {
+        const r = eye.getBoundingClientRect(), k = kc.getBoundingClientRect();
+        return { x: r.left + r.width / 2 - k.left, y: r.top + r.height / 2 - k.top, w: r.width };
+      };
+      const step = (dt) => {
+        const a = anchor();
+        if (!a.w) return;
+        seg = Math.max(6, a.w * .62);
+        if (!ready) { P.forEach((q, i) => { q.x = q.px = a.x; q.y = q.py = a.y + i * seg; }); ready = true; }
+        const g = 2400 * dt * dt;
+        P.forEach((q, i) => {
+          if (i === 0) return;
+          const vx = (q.x - q.px) * .955, vy = (q.y - q.py) * .955;
+          q.px = q.x; q.py = q.y; q.x += vx; q.y += vy + g;
+        });
+        P[0].x = a.x; P[0].y = a.y;
+        for (let it = 0; it < 10; it++) {
+          for (let i = 0; i < N - 1; i++) {
+            const Aa = P[i], B = P[i + 1];
+            const dx = B.x - Aa.x, dy = B.y - Aa.y, d = Math.hypot(dx, dy) || .001, diff = (d - seg) / d;
+            const wa = i === 0 ? 0 : 1 / W[i], wb = 1 / W[i + 1], sum = wa + wb;
+            Aa.x += dx * diff * wa / sum; Aa.y += dy * diff * wa / sum;
+            B.x -= dx * diff * wb / sum; B.y -= dy * diff * wb / sum;
+          }
+        }
+      };
+      const draw = () => {
+        let h = `<circle cx="${P[0].x}" cy="${P[0].y}" r="${seg * .72}" class="kc__ring"/>`;
+        for (let i = 0; i < N - 1; i++) {
+          const Aa = P[i], B = P[i + 1], cx = (Aa.x + B.x) / 2, cy = (Aa.y + B.y) / 2;
+          const ang = Math.atan2(B.y - Aa.y, B.x - Aa.x) * 180 / Math.PI, L = seg * 1.18;
+          h += i % 2
+            ? `<rect x="${-L / 2}" y="-1.3" width="${L}" height="2.6" rx="1.3" transform="translate(${cx} ${cy}) rotate(${ang})" class="kc__edge"/>`
+            : `<ellipse rx="${L / 2}" ry="${seg * .36}" transform="translate(${cx} ${cy}) rotate(${ang})" class="kc__link"/>`;
+        }
+        svg.innerHTML = h;
+        const E = P[N - 1], D = P[N - 2];
+        charm.style.transform = `translate(${E.x}px, ${E.y}px) rotate(${Math.atan2(E.y - D.y, E.x - D.x) * 180 / Math.PI - 90}deg)`;
+      };
+      const tick = (now) => {
+        const dt = Math.min(.033, (now - last) / 1000); last = now;
+        step(dt / 2); step(dt / 2);
+        if (ready) draw();
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    };
+    const stop = (now) => {
+      const kc = host && host.querySelector('#kc');
+      if (kc) kc.classList.add('is-hidden');
+      if (now) cancelAnimationFrame(raf); else setTimeout(() => cancelAnimationFrame(raf), 400);
+    };
+    return { start, stop };
+  })();
   let state = null;
   const at = (ms, fn) => timers.push(setTimeout(fn, ms));
   const clear = () => { timers.forEach(clearTimeout); timers = []; };
@@ -52,11 +122,20 @@ const Console = (() => {
   const markup = (p) => `
     <div class="pc" id="pc">
       <span class="pc__scrim"></span>
+      <div class="kc" id="kc" aria-hidden="true">
+        <svg class="kc__chain" id="kcChain"></svg>
+        <button class="kc__charm" id="kcCharm" type="button" tabindex="-1"><img class="kc__img" alt=""></button>
+      </div>
       <div class="pc__stage" id="pcStage">
 
         <div class="pc__closed" aria-hidden="true">
-          <img class="pc__lid" src="${A}lid-closed.png" alt="">
-          <img class="pc__paw" src="${A}paw.png" alt="">
+          <div class="pc__body">
+            <img class="pc__lid" src="${A}lid-closed.png" alt="">
+            <div class="pc__under"><span class="under__vents">${'<i></i>'.repeat(7)}</span>
+              <span class="under__label"><b>wanaka</b><em>W1 · Plan console</em></span></div>
+            <span class="pc__lug"><span class="pc__eyelet" id="pcEye"></span></span>
+          </div>
+          <span class="pc__paw"><img src="${A}paw.png" alt=""><i class="paw__arm"></i></span>
         </div>
 
         <div class="pc__open">
@@ -182,10 +261,17 @@ const Console = (() => {
     if (name === 'assets') { paintCats(); paintGrid(); }
   };
 
-  const leave = (then) => {
+  const leave = (how, then) => {
     const pc = $('#pc');
-    pc.classList.add('is-leaving');
-    at(700, then);
+    if (how === 'approve') {
+      // shut, spin, and the paw takes it away — with the keychain back on while it is shut
+      pc.classList.add('is-leaving');
+      at(380, () => Keychain.start(host));
+      at(3500, then);
+    } else {
+      pc.classList.add('is-closing');
+      at(450, then);
+    }
   };
 
   /* ── wiring ────────────────────────────────────────────────────── */
@@ -200,7 +286,8 @@ const Console = (() => {
     state.unfit = () => removeEventListener('resize', fit);
 
     // the paw brings it up, then it opens and the cover starts generating
-    at(2000, () => { $('#pc').classList.add('is-open'); generate(); });
+    Keychain.start(host);
+    at(2700, () => { $('#pc').classList.add('is-open'); Keychain.stop(); generate(); });
 
     $('#pcRegen').onclick = () => { state.regens += 1; generate({ fail: state.regens === 2 }); };
     $('#pcRetry').onclick = () => generate();
@@ -208,9 +295,9 @@ const Console = (() => {
     $$('.tab').forEach((t) => { t.onclick = () => step(t.dataset.tab); });
     $('#pcNext').onclick = () => {
       if (state.step === 'plan') return step('assets');
-      leave(() => document.dispatchEvent(new CustomEvent('e-approved', { detail: { picks: state.picks } })));
+      leave('approve', () => document.dispatchEvent(new CustomEvent('e-approved', { detail: { picks: state.picks } })));
     };
-    $('#pcCancel').onclick = () => leave(() => unmount());
+    $('#pcCancel').onclick = () => leave('cancel', () => unmount());
 
     // selects
     $$('.sel').forEach((s) => {
@@ -258,6 +345,7 @@ const Console = (() => {
   };
   const unmount = () => {
     clear();
+    Keychain.stop(true);
     if (state && state.unfit) state.unfit();
     if (host) { host.innerHTML = ''; host.hidden = true; }
   };
