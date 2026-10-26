@@ -23,9 +23,13 @@ const Console = (() => {
         .map(([n, f]) => ({ name: n, art: `${A}env/${f}.jpg` })),
     },
     {
-      key: 'music', name: 'Music', icon: 'cat-music.png', wide: true,
-      items: [['Desert Wind', 'canyon'], ['Green Hills', 'meadow'], ['Tide Pool', 'beach'], ['Deep Blue', 'ocean'], ['Golden Hour', 'sunset']]
-        .map(([n, f]) => ({ name: n, art: `${A}env/${f}.jpg` })),
+      key: 'music', name: 'Music', icon: 'cat-music.png', audio: true,
+      // name, mood (sets the preview's scale and tempo), length in seconds
+      items: [['Island Hop Theme', 'bright', 108], ['Coconut Bounce', 'bright', 84], ['Tide Pool', 'calm', 126],
+        ['Rope Swing', 'bright', 72], ['Sunny Shore', 'calm', 141], ['Seagull Chase', 'tense', 66], ['Coral Cove', 'calm', 118],
+        ['Steel Drum Jam', 'bright', 95], ['Last Jump', 'tense', 58], ['Far Beach', 'calm', 152], ['Night Lagoon', 'calm', 133],
+        ['Ukulele Morning', 'bright', 101], ['Storm Clouds', 'tense', 79], ['Victory Splash', 'bright', 42], ['Sand Castle', 'calm', 88]]
+        .map(([n, mood, len], i) => ({ name: n, mood, len, seed: i + 1 })),
     },
   ];
 
@@ -225,16 +229,78 @@ const Console = (() => {
     at(ms, () => cover(fail ? 'failed' : 'ready'));
   };
 
+  /* ── music previews: a short tune made on the spot, one at a time ── */
+  const Preview = (() => {
+    const CLIP = 12;   // seconds of preview
+    const SCALES = { bright: [0, 2, 4, 7, 9], calm: [0, 3, 5, 7, 10], tense: [0, 1, 3, 6, 7] };
+    const TEMPO = { bright: 132, calm: 84, tense: 150 };
+    let ctx = null, out = null, now = null, raf = 0;
+    const rand = (seed) => () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+    const note = (t, f, len, type, vol) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + .01);
+      g.gain.exponentialRampToValueAtTime(.0001, t + len);
+      o.connect(g).connect(out); o.start(t); o.stop(t + len + .05);
+    };
+    const play = (it, onTick, onEnd) => {
+      stop();
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      ctx.resume();
+      out = ctx.createGain(); out.gain.value = .5; out.connect(ctx.destination);
+      const r = rand(it.seed * 7919), sc = SCALES[it.mood], beat = 60 / TEMPO[it.mood], t0 = ctx.currentTime + .05;
+      const root = 220 * 2 ** ((it.seed % 7) / 12), hz = (deg) => root * 2 ** ((sc[deg % 5] + 12 * Math.floor(deg / 5)) / 12);
+      const riff = Array.from({ length: 8 }, () => Math.floor(r() * 8) + 3);
+      for (let i = 0, t = t0; t < t0 + CLIP; i++, t += beat / 2) {
+        if (r() > .18) note(t, hz(riff[i % 8] + (Math.floor(i / 16) % 2) * 2), beat * .9, it.mood === 'calm' ? 'sine' : 'triangle', .12);
+        if (i % 4 === 0) note(t, hz(i % 16 < 8 ? 0 : 3) / 2, beat * 1.8, 'sine', .16);
+      }
+      const start = performance.now();
+      now = { it, onEnd };
+      const tick = () => {
+        const p = Math.min((performance.now() - start) / (CLIP * 1000), 1);
+        onTick(p, Math.floor(p * CLIP));
+        if (p < 1) raf = requestAnimationFrame(tick); else stop();
+      };
+      tick();
+    };
+    const stop = () => {
+      cancelAnimationFrame(raf);
+      if (out) { const o = out; o.gain.setTargetAtTime(0, ctx.currentTime, .03); setTimeout(() => o.disconnect(), 200); out = null; }
+      if (now) { const { onEnd } = now; now = null; onEnd(); }
+    };
+    const playing = () => now && now.it;
+    return { play, stop, playing };
+  })();
+  const clock = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+  // a fixed-looking waveform per track
+  const wave = (seed) => {
+    let x = seed * 9301;
+    return Array.from({ length: 26 }, (_, i) => {
+      x = (x * 16807) % 2147483647;
+      const env = Math.sin(Math.PI * (i + .5) / 26) * .55 + .45;
+      return Math.round(10 + env * (x % 100) / 100 * 34);
+    });
+  };
+
   /* ── the asset grid for the open category ─────────────────────── */
   const paintGrid = () => {
+    Preview.stop();
     const shelf = SHELVES[state.cat];
     const q = $('#pcSearch').value.trim().toLowerCase();
     const items = shelf.items.filter((it) => !q || it.name.toLowerCase().includes(q));
     const picked = state.picks[shelf.key];
+    const art = (it) => shelf.audio ? `
+          <span class="track">
+            <span class="track__wave">${wave(it.seed).map((h) => `<i style="height:${h}px"></i>`).join('')}</span>
+            <span class="track__play" role="button" aria-label="Play ${it.name}"></span>
+            <span class="track__time">${clock(it.len)}</span>
+          </span>` : `
+          <img class="art" src="${it.art}" alt="" loading="lazy">`;
     $('#pcGrid').innerHTML = items.length ? items.map((it) => `
-      <button class="tile${shelf.wide ? ' tile--wide' : ''}${picked.has(it.name) ? ' is-on' : ''}" type="button" data-name="${it.name}">
-        <span class="tile__art">
-          <img class="art" src="${it.art}" alt="" loading="lazy">
+      <button class="tile${shelf.wide ? ' tile--wide' : ''}${shelf.audio ? ' tile--audio' : ''}${picked.has(it.name) ? ' is-on' : ''}" type="button" data-name="${it.name}">
+        <span class="tile__art">${art(it)}
           <img class="tile__pick tile__pick--off" src="${A}pick-off.svg" alt="">
           <span class="tile__pick tile__pick--on"></span>
         </span>
@@ -246,6 +312,23 @@ const Console = (() => {
         if (picked.has(n)) picked.delete(n); else picked.add(n);
         t.classList.toggle('is-on', picked.has(n));
         paintCats();
+      };
+    });
+    $$('.track__play').forEach((b) => {
+      b.onclick = (e) => {
+        e.stopPropagation();
+        const tile = b.closest('.tile'), it = shelf.items.find((x) => x.name === tile.dataset.name);
+        if (Preview.playing() === it) return Preview.stop();
+        const bars = [...tile.querySelectorAll('.track__wave i')], time = tile.querySelector('.track__time');
+        tile.classList.add('is-playing');
+        Preview.play(it, (p, sec) => {
+          bars.forEach((bar, i) => bar.classList.toggle('is-past', i / bars.length < p));
+          time.textContent = clock(sec);
+        }, () => {
+          tile.classList.remove('is-playing');
+          bars.forEach((bar) => bar.classList.remove('is-past'));
+          time.textContent = clock(it.len);
+        });
       };
     });
   };
@@ -265,10 +348,11 @@ const Console = (() => {
     $$('.tab').forEach((t) => t.classList.toggle('is-on', t.dataset.tab === name));
     $$('.page').forEach((p) => p.classList.toggle('is-on', p.dataset.page === name));
     $('#pcNext').textContent = name === 'plan' ? 'Next Assets' : 'Approve';
-    if (name === 'assets') { paintCats(); paintGrid(); }
+    if (name === 'assets') { paintCats(); paintGrid(); } else Preview.stop();
   };
 
   const leave = (how, then) => {
+    Preview.stop();
     const pc = $('#pc');
     if (how === 'approve') {
       // shut, spin, and the paw takes it away — with the keychain back on while it is shut
@@ -355,6 +439,7 @@ const Console = (() => {
   };
   const unmount = () => {
     clear();
+    Preview.stop();
     Keychain.stop(true);
     if (state && state.unfit) state.unfit();
     if (host) { host.innerHTML = ''; host.hidden = true; }

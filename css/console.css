@@ -237,6 +237,24 @@ textarea.inp { height: 80px; }
 .tile.is-on .tile__pick--on { display: block; }
 .tile.is-on .tile__art { box-shadow: inset 0 0 0 2px #fff; }
 .tile__name { width: 100%; font-size: 16px; line-height: 20px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* music tiles: waveform, play, length — lime while it plays */
+.track { position: absolute; inset: 0; }
+.track__wave { position: absolute; left: 12px; right: 12px; top: 40px; height: 44px; display: flex; align-items: center; justify-content: space-between; }
+.track__wave i { width: 2.6px; border-radius: 2px; background: rgba(255, 255, 255, .28); transition: background .15s; }
+.tile:hover .track__wave i { background: rgba(255, 255, 255, .4); }
+.track__wave i.is-past { background: #c0f000; }
+.track__play { position: absolute; left: 10px; bottom: 10px; width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(255, 255, 255, .12); transition: background .15s, transform .15s; }
+.track__play::after { content: ''; position: absolute; left: 11.5px; top: 9px; border-style: solid; border-width: 6px 0 6px 9px;
+  border-color: transparent transparent transparent #fff; }
+.track__play:hover { background: rgba(255, 255, 255, .22); transform: scale(1.06); }
+.tile.is-playing .track__play { background: #c0f000; }
+.tile.is-playing .track__play::after { left: 10px; top: 9.5px; height: 11px; border: 0; border-left: 3px solid #121214;
+  border-right: 3px solid #121214; box-sizing: content-box; width: 4px; }
+.track__time { position: absolute; right: 12px; bottom: 16px; font: 400 12px/14px var(--sans); color: rgba(255, 255, 255, .6);
+  font-variant-numeric: tabular-nums; }
+.tile.is-playing .track__time { color: #c0f000; }
+.tile.is-playing .tile__art { background: rgba(192, 240, 0, .07); }
 .empty { grid-column: 1 / -1; padding: 60px 0; text-align: center; color: rgba(255, 255, 255, .5); font-size: 14px; }
 
 /* ── opening: the shut console settles onto the right half, then its cover flips open ──
