@@ -133,8 +133,7 @@ const Console = (() => {
           <div class="pc__body">
             <div class="half pc__face"><img class="out__badge" src="${A}badge.png" alt="">
               <img class="out__word" src="${A}wanaka-engraved.svg" alt=""><img class="out__paw" src="${A}paw-print.svg" alt=""></div>
-            <div class="pc__under"><span class="under__vents">${'<i></i>'.repeat(7)}</span>
-              <span class="under__label"><b>wanaka</b><em>W1 · Plan console</em></span></div>
+            <div class="pc__under"></div>
             ${Keychain.markup()}
           </div>
           <span class="pc__paw"><img src="${A}paw.png" alt=""><i class="paw__arm"></i></span>

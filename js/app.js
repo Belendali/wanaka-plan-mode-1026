@@ -43,8 +43,6 @@
     openPlan(true);
   }
 
-  // the console leaves once the plan is approved, and the team starts building
-  document.addEventListener('e-approved', () => {
-    setTimeout(() => { Console.unmount(); Studio.built(); }, 300);
-  });
+  // the run ends when the paw has taken the approved console away
+  document.addEventListener('e-approved', () => Console.unmount());
 })();
