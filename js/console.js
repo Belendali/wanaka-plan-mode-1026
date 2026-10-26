@@ -49,6 +49,62 @@ const Console = (() => {
 
   let host = null, plan = null, timers = [];
 
+  /* ── the keychain: it hangs from a lug on the shut console and lives inside it,
+     so it can never drift off the console. A damped pendulum reads the console's own
+     transform each frame (no layout reads), so it swings when the console is pushed,
+     tilted or carried, and rides along untouched while it turns in 3D. ── */
+  const Keychain = (() => {
+    const TAGS = [['tag-v2-1', .524, .115, .998], ['tag-v2-2', .482, .119, .973], ['tag-v2-3', .488, .118, .996],
+      ['tag-v2-4', .473, .113, .981], ['tag-v2-5', .489, .116, 1.002]];
+    const L = 74, W = 112, G = 2600, DAMP = 3.2, MAX = .85, PUSH = .45;   // chain length, charm width (stage px), gravity, damping, max swing (rad), how much the console's motion throws it
+    let raf = 0, el = null;
+    const markup = () => {
+      const [name, hx, hy, ar] = TAGS[Math.floor(Math.random() * TAGS.length)];
+      const links = Array.from({ length: 7 }, (_, i) => {
+        const y = 6 + i * ((L - 8) / 7);
+        return i % 2 ? `<rect x="-1.3" y="${y}" width="2.6" height="${(L - 8) / 7 + 1}" rx="1.3" class="kc__edge"/>`
+          : `<ellipse cx="0" cy="${y + (L - 8) / 14}" rx="3.1" ry="${(L - 8) / 14 + 1.2}" class="kc__link"/>`;
+      }).join('');
+      return `<span class="pc__lug"><span class="pc__eyelet"></span></span>
+        <span class="kc" style="--hx:${hx};--hy:${hy};--ar:${ar}">
+          <svg class="kc__chain" viewBox="-8 0 16 ${L}" width="16" height="${L}"><circle cx="0" cy="3" r="3.4" class="kc__ring"/>${links}</svg>
+          <img class="kc__img" src="${A}tags/${name}.png" alt="" style="width:${W}px;left:${-W * hx}px;top:${L - (W / ar) * hy}px">
+        </span>`;
+    };
+    // where the pivot is on screen-space axes, from the transforms of the console and its box
+    const pivot = (body, box) => {
+      const mb = new DOMMatrix(getComputedStyle(body).transform === 'none' ? undefined : getComputedStyle(body).transform);
+      const mc = new DOMMatrix(getComputedStyle(box).transform === 'none' ? undefined : getComputedStyle(box).transform);
+      return { flat: mb.is2D, ang: Math.atan2(mb.b, mb.a), m: mc.multiply(mb) };
+    };
+    const start = (root) => {
+      cancelAnimationFrame(raf);
+      el = root.querySelector('.kc');
+      const body = root.querySelector('.pc__body'), box = root.querySelector('.pc__closed');
+      if (!el || !body) return;
+      let th = 0, w = 0, last = 0, p0 = null, v0 = null, local = 0;
+      const tick = (t) => {
+        const dt = Math.min(.033, last ? (t - last) / 1000 : .016); last = t;
+        const { flat, ang, m } = pivot(body, box);
+        if (flat) {
+          const p = { x: m.e, y: m.f };   // pivot motion is dominated by the console's translation
+          const v = p0 ? { x: (p.x - p0.x) / dt, y: (p.y - p0.y) / dt } : { x: 0, y: 0 };
+          const a = v0 ? { x: (v.x - v0.x) / dt, y: (v.y - v0.y) / dt } : { x: 0, y: 0 };
+          const ax = PUSH * Math.max(-6000, Math.min(6000, a.x)), ay = PUSH * Math.max(-6000, Math.min(6000, a.y));
+          w += ((-ax * Math.cos(th) - (G - ay) * Math.sin(th)) / L - DAMP * w) * dt;
+          th = Math.max(-MAX, Math.min(MAX, th + w * dt));
+          p0 = p; v0 = v;
+          local = th - ang;   // the console's own tilt is undone, so the chain hangs true
+        }
+        el.style.transform = `rotate(${local}rad)`;
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    };
+    const stop = () => { cancelAnimationFrame(raf); raf = 0; };
+    return { markup, start, stop };
+  })();
+
   let state = null;
   const at = (ms, fn) => timers.push(setTimeout(fn, ms));
   const clear = () => { timers.forEach(clearTimeout); timers = []; };
@@ -68,8 +124,8 @@ const Console = (() => {
       <button class="opt${on.includes(o) ? ' is-on' : ''}" type="button" data-v="${o}">
         <img src="${A}${on.includes(o) ? 'check-on' : 'check-off'}.svg" alt="">${o}</button>`).join('')}</div>`;
 
-  const markup = (p) => `
-    <div class="pc" id="pc">
+  const markup = (p, view) => `
+    <div class="pc${view ? ' is-open is-view kc-off' : ''}" id="pc">
       <span class="pc__scrim"></span>
       <div class="pc__stage" id="pcStage">
 
@@ -79,6 +135,7 @@ const Console = (() => {
               <img class="out__word" src="${A}wanaka-engraved.svg" alt=""><img class="out__paw" src="${A}paw-print.svg" alt=""></div>
             <div class="pc__under"><span class="under__vents">${'<i></i>'.repeat(7)}</span>
               <span class="under__label"><b>wanaka</b><em>W1 · Plan console</em></span></div>
+            ${Keychain.markup()}
           </div>
           <span class="pc__paw"><img src="${A}paw.png" alt=""><i class="paw__arm"></i></span>
         </div>
@@ -309,6 +366,8 @@ const Console = (() => {
       // shut, spin, and the paw takes it away — with the keychain back on while it is shut
       pc.classList.add('is-leaving');
       at(700, () => pc.classList.add('is-folded'));
+      Keychain.start(host);
+      at(760, () => pc.classList.remove('kc-off'));
       at(4300, then);
     } else {
       pc.classList.add('is-closing');
@@ -328,8 +387,12 @@ const Console = (() => {
     addEventListener('resize', fit);
     state.unfit = () => removeEventListener('resize', fit);
 
-    // the paw brings it up, then it opens and the cover starts generating
-    at(2450, () => $('#pc').classList.add('is-open'));
+    // the paw brings it up, the keychain drops away, then the cover opens right there
+    if (!state.view) {
+      Keychain.start(host);
+      at(2150, () => $('#pc').classList.add('kc-off'));
+      at(2450, () => { $('#pc').classList.add('is-open'); Keychain.stop(); });
+    }
 
     $('#pcRegen').onclick = () => { state.regens += 1; generate({ fail: state.regens === 2 }); };
     $('#pcRetry').onclick = () => generate();
@@ -378,17 +441,19 @@ const Console = (() => {
     $('#pcSearch').oninput = paintGrid;
   };
 
-  const mount = (el, p) => {
+  // view: straight to the opened plan, no arrival (for looking at a plan that's already made)
+  const mount = (el, p, { view = false } = {}) => {
     clear();
     host = el; plan = p;
-    state = { step: 'plan', cat: 0, regens: 0, picks: Object.fromEntries(SHELVES.map((s) => [s.key, new Set()])) };
-    host.innerHTML = markup(p);
+    state = { step: 'plan', cat: 0, regens: 0, view, picks: Object.fromEntries(SHELVES.map((s) => [s.key, new Set()])) };
+    host.innerHTML = markup(p, view);
     host.hidden = false;
     wire();
   };
   const unmount = () => {
     clear();
     Preview.stop();
+    Keychain.stop();
     if (state && state.unfit) state.unfit();
     if (host) { host.innerHTML = ''; host.hidden = true; }
   };

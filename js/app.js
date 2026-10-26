@@ -15,9 +15,12 @@
     document.getElementById('app').appendChild(consoleHost);
   }
 
-  const openPlan = () => {
-    if (!consoleHost.hidden) return;
-    Console.mount(consoleHost, PLAN);
+  // the chat opens the plan by itself once; after that only the card's button reopens it
+  let shown = false;
+  const openPlan = (opts) => {
+    if (!consoleHost.hidden || (shown && !opts)) return;
+    shown = true;
+    Console.mount(consoleHost, PLAN, opts);
   };
 
   renderCards();
@@ -32,11 +35,13 @@
     },
   });
 
-  // ?go=console skips the home page and the chat, straight to the console
-  if (new URLSearchParams(location.search).get('go') === 'console') {
+  // ?go=console skips the home page and the chat, straight to the console;
+  // ?view=plan shows the finished plan, already open
+  const q = new URLSearchParams(location.search);
+  if (q.get('go') === 'console' || q.get('view') === 'plan') {
     show('studio');
     Studio.open('Make me a jump game', openPlan);
-    openPlan();
+    openPlan({ view: q.get('view') === 'plan' });
   }
 
   // the console leaves once the plan is approved, and the team starts building

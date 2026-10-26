@@ -138,7 +138,7 @@ const Studio = (() => {
         <div class="msg plancard"><img src="${PLAN.cover}" alt="">
           <div><em>Plan v1.0</em><b>${PLAN.title}: ${PLAN.sub}</b><button type="button">View full plan</button></div>
         </div>`));
-      card.querySelector('button').onclick = () => onPlanReady();
+      card.querySelector('button').onclick = () => onPlanReady({ view: true });   // looking again: already open
       at(700, () => card.classList.add('is-hot'));
       at(1400, () => onPlanReady());
     });
