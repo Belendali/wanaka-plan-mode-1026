@@ -11,19 +11,19 @@ const Console = (() => {
   // what the Artist can pull from, per category
   const SHELVES = [
     {
-      key: 'characters', name: 'Characters', icon: 'cat-characters.png', wide: false, crew: 'Artist', makes: 'make one',
+      key: 'characters', name: 'Characters', icon: 'cat-characters.png', wide: false, crew: 'Artist',
       items: ['Frost Knight', 'Ridge Scout', 'Ember Ranger', 'Skater Kid', 'Star Witch', 'Tide Mage', 'Sky Pirate',
         'Glade Elf', 'Green Archer', 'Old Captain', 'Night Detective', 'Lumber Jack', 'Wind Samurai', 'Grumpy Gramps',
         'Field Medic', 'Snow Princess', 'City Rebel', 'Moon Dancer', 'Quiet Ranger', 'Iron Viking']
         .map((n, i) => ({ name: n, art: `${A}chars/c${String(i + 1).padStart(2, '0')}.png` })),
     },
     {
-      key: 'scenes', name: 'Scenes', icon: 'cat-ideas.png', wide: true, crew: 'Artist', makes: 'make one',
+      key: 'scenes', name: 'Scenes', icon: 'cat-ideas.png', wide: true, crew: 'Artist',
       items: [['Red Canyon', 'canyon'], ['Spring Meadow', 'meadow'], ['Palm Beach', 'beach'], ['Deep Ocean', 'ocean'], ['Last Sunset', 'sunset']]
         .map(([n, f]) => ({ name: n, art: `${A}env/${f}.jpg` })),
     },
     {
-      key: 'music', name: 'Music', icon: 'cat-music.png', audio: true, crew: 'Musician', makes: 'write one',
+      key: 'music', name: 'Music', icon: 'cat-music.png', audio: true, crew: 'Musician',
       // name, mood (sets the preview's scale and tempo), length in seconds
       items: [['Island Hop Theme', 'bright', 108], ['Coconut Bounce', 'bright', 84], ['Tide Pool', 'calm', 126],
         ['Rope Swing', 'bright', 72], ['Sunny Shore', 'calm', 141], ['Seagull Chase', 'tense', 66], ['Coral Cove', 'calm', 118],
@@ -175,7 +175,7 @@ const Console = (() => {
               <button class="cat${i === 0 ? ' is-on' : ''}" type="button" data-cat="${i}">
                 <img class="cat__icon" src="${A}${s.icon}" alt="">
                 <span class="cat__row"><span class="cat__name">${s.name}</span><img class="cat__chev" src="${A}chevron-right.svg" alt=""></span>
-                <span class="cat__sub">Up to the ${s.crew}</span>
+                <span class="cat__sub">Picked by AI</span>
               </button>`).join('')}
             </div>
           </section>
@@ -310,7 +310,7 @@ const Console = (() => {
       <div class="empty">
         <img class="empty__crew" src="${A}crew-${shelf.crew.toLowerCase()}.png" alt="">
         <p class="empty__title">No “${esc($('#pcSearch').value.trim())}” in the library</p>
-        <p class="empty__body">The ${shelf.crew} will ${shelf.makes} for your game.</p>
+        <p class="empty__body">Leave it to AI. It will pick one that fits your game.</p>
         <button class="btn btn--dark empty__clear" type="button">Clear search</button>
       </div>`;
     const clear = $('.empty__clear');
@@ -346,7 +346,7 @@ const Console = (() => {
       const n = state.picks[SHELVES[i].key].size;
       c.classList.toggle('is-on', i === state.cat);
       c.classList.toggle('has-picks', n > 0);
-      c.querySelector('.cat__sub').textContent = n ? `${n} picked by you` : `Up to the ${SHELVES[i].crew}`;
+      c.querySelector('.cat__sub').textContent = n ? `${n} picked by you` : 'Picked by AI';
     });
   };
 
