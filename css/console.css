@@ -82,8 +82,10 @@
   background: radial-gradient(circle, #0b0c0e 0 34%, transparent 36%), conic-gradient(from 200deg, #8e9297, #e9ecef, #9a9ea3, #5e6166, #c9cdd1, #8e9297);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, .55); }
 .kc { position: absolute; left: calc(100% + 19px); top: calc(68% + 15px); width: 0; height: 0; transform-origin: 0 0;
-  pointer-events: none; transition: opacity .25s ease; }
-.pc.kc-off .kc { opacity: 0; }
+  pointer-events: none; visibility: hidden; }
+/* hung on: it drops onto the eyelet and the pendulum takes it from there */
+.pc.kc-on .kc { visibility: visible; animation: kcHang .38s cubic-bezier(.3, 1.5, .5, 1) both; }
+@keyframes kcHang { from { translate: 0 -46px; opacity: 0; } 40% { opacity: 1; } }
 .kc__chain { position: absolute; left: -8px; top: -3px; overflow: visible; filter: drop-shadow(0 3px 2px rgba(0, 0, 0, .45)); }
 .kc__link { fill: none; stroke: #d5d9dd; stroke-width: 1.9; }
 .kc__edge { fill: #aeb3b8; stroke: #6e7378; stroke-width: .6; }

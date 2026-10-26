@@ -49,8 +49,8 @@ const Console = (() => {
 
   let host = null, plan = null, timers = [];
 
-  /* ── the keychain: it hangs from a lug on the shut console and lives inside it,
-     so it can never drift off the console. A damped pendulum reads the console's own
+  /* ── the keychain: hung on once the plan is approved. It hangs from a lug on the shut
+     console and lives inside it, so it can never drift off the console. A damped pendulum reads the console's own
      transform each frame (no layout reads), so it swings when the console is pushed,
      tilted or carried, and rides along untouched while it turns in 3D. ── */
   const Keychain = (() => {
@@ -77,12 +77,12 @@ const Console = (() => {
       const mc = new DOMMatrix(getComputedStyle(box).transform === 'none' ? undefined : getComputedStyle(box).transform);
       return { flat: mb.is2D, ang: Math.atan2(mb.b, mb.a), m: mc.multiply(mb) };
     };
-    const start = (root) => {
+    const start = (root, swing = 0) => {
       cancelAnimationFrame(raf);
       el = root.querySelector('.kc');
       const body = root.querySelector('.pc__body'), box = root.querySelector('.pc__closed');
       if (!el || !body) return;
-      let th = 0, w = 0, last = 0, p0 = null, v0 = null, local = 0;
+      let th = swing, w = 0, last = 0, p0 = null, v0 = null, local = -swing;
       const tick = (t) => {
         const dt = Math.min(.033, last ? (t - last) / 1000 : .016); last = t;
         const { flat, ang, m } = pivot(body, box);
@@ -94,7 +94,7 @@ const Console = (() => {
           w += ((-ax * Math.cos(th) - (G - ay) * Math.sin(th)) / L - DAMP * w) * dt;
           th = Math.max(-MAX, Math.min(MAX, th + w * dt));
           p0 = p; v0 = v;
-          local = th - ang;   // the console's own tilt is undone, so the chain hangs true
+          local = -th - ang;   // CSS turns clockwise, θ counts toward +x; the console's own tilt is undone so it hangs true
         }
         el.style.transform = `rotate(${local}rad)`;
         raf = requestAnimationFrame(tick);
@@ -366,8 +366,8 @@ const Console = (() => {
       // shut, spin, and the paw takes it away — with the keychain back on while it is shut
       pc.classList.add('is-leaving');
       at(700, () => pc.classList.add('is-folded'));
-      Keychain.start(host);
-      at(760, () => pc.classList.remove('kc-off'));
+      // the plan is done: a keychain gets hung on the shut console before it goes
+      at(760, () => { Keychain.start(host, .7); pc.classList.add('kc-on'); });
       at(4300, then);
     } else {
       pc.classList.add('is-closing');
@@ -388,9 +388,7 @@ const Console = (() => {
     state.unfit = () => removeEventListener('resize', fit);
 
     // the paw brings it up, the keychain drops away, then the cover opens right there
-    Keychain.start(host);
-    at(2150, () => $('#pc').classList.add('kc-off'));
-    at(2450, () => { $('#pc').classList.add('is-open'); Keychain.stop(); });
+    at(2450, () => $('#pc').classList.add('is-open'));
 
     $('#pcRegen').onclick = () => { state.regens += 1; generate({ fail: state.regens === 2 }); };
     $('#pcRetry').onclick = () => generate();
