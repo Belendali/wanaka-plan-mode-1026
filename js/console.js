@@ -124,8 +124,8 @@ const Console = (() => {
       <button class="opt${on.includes(o) ? ' is-on' : ''}" type="button" data-v="${o}">
         <img src="${A}${on.includes(o) ? 'check-on' : 'check-off'}.svg" alt="">${o}</button>`).join('')}</div>`;
 
-  const markup = (p, view) => `
-    <div class="pc${view ? ' is-open is-view kc-off' : ''}" id="pc">
+  const markup = (p) => `
+    <div class="pc" id="pc">
       <span class="pc__scrim"></span>
       <div class="pc__stage" id="pcStage">
 
@@ -388,11 +388,9 @@ const Console = (() => {
     state.unfit = () => removeEventListener('resize', fit);
 
     // the paw brings it up, the keychain drops away, then the cover opens right there
-    if (!state.view) {
-      Keychain.start(host);
-      at(2150, () => $('#pc').classList.add('kc-off'));
-      at(2450, () => { $('#pc').classList.add('is-open'); Keychain.stop(); });
-    }
+    Keychain.start(host);
+    at(2150, () => $('#pc').classList.add('kc-off'));
+    at(2450, () => { $('#pc').classList.add('is-open'); Keychain.stop(); });
 
     $('#pcRegen').onclick = () => { state.regens += 1; generate({ fail: state.regens === 2 }); };
     $('#pcRetry').onclick = () => generate();
@@ -441,12 +439,11 @@ const Console = (() => {
     $('#pcSearch').oninput = paintGrid;
   };
 
-  // view: straight to the opened plan, no arrival (for looking at a plan that's already made)
-  const mount = (el, p, { view = false } = {}) => {
+  const mount = (el, p) => {
     clear();
     host = el; plan = p;
-    state = { step: 'plan', cat: 0, regens: 0, view, picks: Object.fromEntries(SHELVES.map((s) => [s.key, new Set()])) };
-    host.innerHTML = markup(p, view);
+    state = { step: 'plan', cat: 0, regens: 0, picks: Object.fromEntries(SHELVES.map((s) => [s.key, new Set()])) };
+    host.innerHTML = markup(p);
     host.hidden = false;
     wire();
   };

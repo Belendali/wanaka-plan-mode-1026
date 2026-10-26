@@ -17,10 +17,10 @@
 
   // the chat opens the plan by itself once; after that only the card's button reopens it
   let shown = false;
-  const openPlan = (opts) => {
-    if (!consoleHost.hidden || (shown && !opts)) return;
+  const openPlan = (byHand) => {
+    if (!consoleHost.hidden || (shown && !byHand)) return;
     shown = true;
-    Console.mount(consoleHost, PLAN, opts);
+    Console.mount(consoleHost, PLAN);
   };
 
   renderCards();
@@ -35,13 +35,12 @@
     },
   });
 
-  // ?go=console skips the home page and the chat, straight to the console;
-  // ?view=plan shows the finished plan, already open
+  // ?go=console (or ?view=plan) skips the home page and the chat, straight to the console
   const q = new URLSearchParams(location.search);
   if (q.get('go') === 'console' || q.get('view') === 'plan') {
     show('studio');
     Studio.open('Make me a jump game', openPlan);
-    openPlan({ view: q.get('view') === 'plan' });
+    openPlan(true);
   }
 
   // the console leaves once the plan is approved, and the team starts building

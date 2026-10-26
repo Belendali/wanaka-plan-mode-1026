@@ -274,13 +274,6 @@ textarea.inp { height: 80px; }
 .out__word { position: absolute; left: 50%; top: 440px; width: 380px; margin-left: -190px; }
 .out__paw { position: absolute; right: 70px; bottom: 80px; width: 150px; opacity: .9; }
 
-/* view: the plan is already made, so it shows open straight away */
-.pc.is-view .pc__open, .pc.is-view .lid, .pc.is-view .pc__body, .pc.is-view .pc__paw { animation: none; }
-.pc.is-view .lid { transform: none; }
-.pc.is-view .pc__paw { transform: translateY(150vh); }
-.pc.is-view .pc__stage { animation: viewIn .35s cubic-bezier(.2, .8, .25, 1) both; }
-@keyframes viewIn { from { opacity: 0; translate: 0 16px; } }
-
 /* ── Approve: the cover flips shut, it turns twice on its upright axis, the paw takes it away ── */
 .pc.is-leaving .lid { animation: lidShut .7s cubic-bezier(.55, 0, .2, 1) both; }
 @keyframes lidShut { from { transform: rotateY(0deg); } to { transform: rotateY(180deg); } }
