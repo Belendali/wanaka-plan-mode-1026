@@ -117,32 +117,20 @@
 .cover.is-ready .cover__glare { opacity: .05; }
 
 .cover__state { position: absolute; inset: 0; z-index: 3; display: none; flex-direction: column;
-  align-items: center; justify-content: center; gap: 12px; text-align: center; }
+  align-items: center; justify-content: center; gap: 12px; padding-top: 86px; text-align: center; }
 .cover.is-generating .cover__state--gen,
 .cover.is-failed .cover__state--fail { display: flex; animation: pcFade .3s ease both; }
+.cover__state--fail { gap: 10px; }
+.cover__icon { width: 40px; height: 40px; }
+.cover__icon--spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .cover__title { margin: 0; font-size: 16px; font-weight: 500; line-height: 24px; }
-.cover__sub { margin: 0; width: 320px; font-size: 13px; line-height: 20px; color: rgba(255, 255, 255, .5); }
-.cover__state--fail .cover__sub { color: rgba(255, 255, 255, .55); }
-/* generating */
+.cover__sub { margin: 0; width: 320px; font-size: 13px; line-height: 20px; color: rgba(255, 255, 255, .55); }
+/* generating: a slow sheen across the empty glass */
 .cover__sheen { position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, .07) 50%, transparent 65%) 0 0 / 250% 100%;
   animation: sheen 2.2s linear infinite; }
 @keyframes sheen { from { background-position: 120% 0; } to { background-position: -120% 0; } }
-.spin { position: relative; width: 44px; height: 44px; border-radius: 50%;
-  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .12); }
-.spin::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 3px solid transparent;
-  border-top-color: #c0f000; border-right-color: #c0f000; animation: spin .9s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.bar { width: 220px; height: 4px; margin-top: 4px; border-radius: 2px; background: rgba(255, 255, 255, .1); overflow: hidden; }
-.bar i { display: block; height: 100%; width: 0; border-radius: 2px; background: #c0f000; }
-.cover.is-generating .bar i { animation: fill var(--gen, 2.8s) cubic-bezier(.3, .6, .4, 1) forwards; }
-@keyframes fill { to { width: 96%; } }
-/* failed */
-.alert { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 22px;
-  background: rgba(255, 107, 92, .14); color: #ff7a6b; font-size: 20px; font-weight: 600; }
-.retry { display: inline-flex; align-items: center; gap: 6px; height: 36px; margin-top: 4px; padding: 0 18px 0 16px;
-  border: 0; border-radius: 18px; background: #fff; color: #121214; font: 500 14px var(--sans); cursor: pointer; }
-.retry:hover { background: #ececec; }
 
 /* under the cover: the engraved name, and Regenerate */
 .pc__word { position: absolute; left: 46px; top: 824px; width: 200px; height: auto; pointer-events: none; }
@@ -155,6 +143,7 @@
 .btn--light { border: .8px solid #e6e6e6; background: #fff; color: #222; box-shadow: 0 2.4px 0 #e6e6e6; }
 .btn--light:hover { filter: brightness(.96); }
 .btn[disabled] { opacity: .4; cursor: default; transform: none; }
+.btn[hidden] { display: none; }
 .regen { position: absolute; left: 669px; top: 822px; }
 .half--l[data-step='plan'] .cats, .half--l[data-step='assets'] .plan-l { display: none; }
 

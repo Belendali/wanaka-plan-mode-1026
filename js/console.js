@@ -170,20 +170,18 @@ const Console = (() => {
                 <span class="cover__glare cover__glare--a"></span><span class="cover__glare cover__glare--b"></span>
                 <div class="cover__state cover__state--gen">
                   <span class="cover__sheen"></span>
-                  <span class="spin"></span>
+                  <img class="cover__icon cover__icon--spin" src="${A}loading.svg" alt="">
                   <p class="cover__title">Generating your cover…</p>
-                  <p class="cover__sub">About 20 seconds — keep editing the plan meanwhile.</p>
-                  <span class="bar"><i></i></span>
                 </div>
                 <div class="cover__state cover__state--fail">
-                  <span class="alert">!</span>
+                  <img class="cover__icon" src="${A}warning.svg" alt="">
                   <p class="cover__title">Couldn't make the cover</p>
                   <p class="cover__sub">Your plan is safe. Try again, or keep going without a cover.</p>
-                  <button class="retry" type="button" id="pcRetry">↻ Try again</button>
+                  <button class="btn btn--light" type="button" id="pcRetry">Try Again</button>
                 </div>
               </div>
               <img class="pc__word" src="${A}wanaka-engraved.svg" alt="Wanaka">
-              <button class="btn btn--dark regen" type="button" id="pcRegen" disabled>Regenerate cover</button>
+              <button class="btn btn--dark regen" type="button" id="pcRegen" hidden>Regenerate cover</button>
             </div>
             <div class="cats">${SHELVES.map((s, i) => `
               <button class="cat${i === 0 ? ' is-on' : ''}" type="button" data-cat="${i}">
@@ -234,12 +232,11 @@ const Console = (() => {
     el.classList.remove('is-generating', 'is-ready', 'is-failed');
     void el.offsetWidth;
     el.classList.add(`is-${mode}`);
-    $('#pcRegen').disabled = mode !== 'ready';
+    $('#pcRegen').hidden = mode !== 'ready';
   };
   const generate = ({ fail = false } = {}) => {
     cover('generating');
     const ms = 2800;
-    $('#pcCover').style.setProperty('--gen', `${ms}ms`);
     at(ms, () => cover(fail ? 'failed' : 'ready'));
   };
 
