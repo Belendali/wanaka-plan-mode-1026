@@ -53,8 +53,6 @@
   55% { transform: translateY(0) rotate(4deg); }
   70%, 100% { transform: translateY(150vh) rotate(0deg); }
 }
-.pc.is-open:not(.is-leaving) .pc__closed { animation: shut .45s ease both; }
-@keyframes shut { to { opacity: 0; transform: translate(-50%, -50%) scale(.92); } }
 
 /* the underside, seen when it turns round on the way out */
 .pc__under { position: absolute; left: 2%; top: 9%; right: 3%; bottom: 4%; border-radius: 44px;
@@ -91,50 +89,14 @@
 .kc__img { display: block; width: 100%; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .45)); }
 
 /* ── Approve: it shuts, turns twice on its upright axis, and the paw takes it away ── */
-.pc.is-open.is-leaving .pc__open, .pc.is-open.is-leaving .half--l { animation: leave .4s ease both; pointer-events: none; }
-@keyframes leave { to { opacity: 0; transform: scale(.94); } }
-.pc.is-leaving .pc__closed { animation: carry 3.5s linear both; }
-@keyframes carry {
-  0%, 10% { opacity: 0; transform: translate(-50%, -50%) scale(.95); }
-  14% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  74% { transform: translate(-50%, -50%) scale(1); animation-timing-function: cubic-bezier(.5, 0, .8, .4); }
-  100% { opacity: 1; transform: translate(-50%, calc(-50% + 120vh)) scale(1); }
-}
-.pc.is-leaving .pc__body { animation: spinOut 3.5s linear both; }
-@keyframes spinOut {
-  /* every frame lists the same functions, so 720deg means two real turns */
-  0%, 16% { transform: translateY(0) rotateY(0deg) scale(1); }
-  20% { transform: translateY(-3%) rotateY(-14deg) scale(1.02); animation-timing-function: cubic-bezier(.45, 0, .25, 1); }
-  56% { transform: translateY(0) rotateY(720deg) scale(.82); animation-timing-function: ease-out; }
-  60% { transform: translateY(0) rotateY(728deg) scale(.82); }
-  64%, 100% { transform: translateY(0) rotateY(720deg) scale(.82); }
-}
-
-.pc.is-leaving .pc__paw { animation: pawTake 3.5s linear both; }
-@keyframes pawTake {
-  0%, 60% { opacity: 0; transform: translateY(80vh); }
-  61% { opacity: 1; transform: translateY(80vh); animation-timing-function: cubic-bezier(.2, .7, .3, 1); }
-  68% { transform: translateY(-2%); }
-  71% { transform: translateY(2%) scale(1.04, .95); }
-  74%, 100% { opacity: 1; transform: translateY(0); }
-}
-.pc.is-leaving .pc__scrim { animation: pcFadeOut .6s ease 2.8s both; }
-.pc.is-leaving .kc { animation: pcFadeOut .3s ease 3.1s both; }
-.pc.is-open.is-closing .pc__open { animation: leave .4s ease both; pointer-events: none; }
-.pc.is-closing .pc__scrim { animation: pcFadeOut .4s ease both; }
-
 /* ── the open console ─────────────────────────────────────────── */
-.pc__open { position: absolute; inset: 0; opacity: 0; pointer-events: none; transform-style: preserve-3d; }
-.pc.is-open .pc__open { opacity: 1; pointer-events: auto; animation: openIn .55s cubic-bezier(.2, .8, .25, 1) both; }
-@keyframes openIn { from { opacity: 0; transform: scale(.94); } }
-.pc.is-open .half--l { animation: swing .7s cubic-bezier(.2, .8, .25, 1) .05s both; transform-origin: 100% 50%; }
-@keyframes swing { from { transform: rotateY(-70deg); opacity: .4; } }
+.pc__open { position: absolute; inset: 0; opacity: 0; pointer-events: none; transform-style: preserve-3d; perspective: 3800px; perspective-origin: 50% 50%; }
 
 .half { position: absolute; top: 0; width: 864px; height: 907px; border-radius: 40px; background: #1d1d1d;
   box-shadow: inset -8px -8px 8px rgba(0, 0, 0, .32), inset 4px 4px 8px rgba(255, 255, 255, .18),
     0 30px 80px rgba(0, 0, 0, .45); overflow: hidden; }
 .half--l { left: 0; }
-.half--r { left: 880px; display: flex; flex-direction: column; }
+.half--r { left: 880px; display: flex; flex-direction: column; transform: translateZ(-2px); }
 .hinge { position: absolute; left: 859px; width: 26px; height: 290px; border-radius: 60px;
   background: url(../assets/v2/hinge.png) center / cover;
   box-shadow: inset 0 4px 4px rgba(255, 255, 255, .11), inset 0 -4px 4px rgba(0, 0, 0, .25); }
@@ -276,3 +238,67 @@ textarea.inp { height: 80px; }
 .tile.is-on .tile__art { box-shadow: inset 0 0 0 2px #fff; }
 .tile__name { width: 100%; font-size: 20.8px; line-height: 20.8px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .empty { grid-column: 1 / -1; padding: 60px 0; text-align: center; color: rgba(255, 255, 255, .5); font-size: 14px; }
+
+/* ── opening: the shut console settles onto the right half, then its cover flips open ──
+   The cover is the left half on a hinge: inside is the screen, outside is the shut
+   lid. Shut, it is turned 180° over the hinge and lies on the base; opening turns
+   it back over to the left, like a book cover. */
+.pc.is-open .pc__open { opacity: 1; transition: opacity .3s ease .15s; }
+/* the container stays click-through: the right half sits 2px behind its plane */
+.pc.is-open:not(.is-leaving):not(.is-closing) .half--r,
+.pc.is-open:not(.is-leaving):not(.is-closing) .lid { pointer-events: auto; }
+.pc.is-open:not(.is-leaving):not(.is-closing) .pc__closed { animation: settle .45s cubic-bezier(.4, 0, .2, 1) both; }
+@keyframes settle { to { opacity: 0; transform: translate(calc(-50% + 440px), -50%) scale(.93); } }
+.lid { position: absolute; left: 0; top: 0; width: 864px; height: 907px; transform-style: preserve-3d;
+  transform-origin: calc(100% + 8px) 50%; transform: rotateY(180deg); }
+.lid .half { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.pc.is-open .lid { animation: lidOpen 1s cubic-bezier(.55, 0, .2, 1) .45s both; }
+@keyframes lidOpen { from { transform: rotateY(180deg); } to { transform: rotateY(0deg); } }
+/* the outside of the cover: the shut lid */
+.half__out { transform: rotateY(180deg); overflow: visible;
+  background: radial-gradient(120% 90% at 20% 0%, rgba(255, 255, 255, .1), transparent 55%), linear-gradient(160deg, #5d5e63, #4c4d52 45%, #3e3f43); }
+.out__badge { position: absolute; left: 50%; top: 210px; width: 180px; margin-left: -90px; border-radius: 34px;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .13), 0 10px 18px rgba(0, 0, 0, .4); }
+.out__word { position: absolute; left: 50%; top: 440px; width: 380px; margin-left: -190px; }
+.out__paw { position: absolute; right: 70px; bottom: 80px; width: 150px; opacity: .9; }
+
+/* ── Approve: the cover flips shut, it turns twice on its upright axis, the paw takes it away ── */
+.pc.is-leaving .lid { animation: lidShut .7s cubic-bezier(.55, 0, .2, 1) both; }
+@keyframes lidShut { from { transform: rotateY(0deg); } to { transform: rotateY(180deg); } }
+.pc.is-leaving .pc__open { pointer-events: none; }
+/* fade only once the cover is shut — a pending opacity animation would flatten the turn */
+.pc.is-folded .pc__open { animation: fadeAway .2s ease both; }
+@keyframes fadeAway { to { opacity: 0; } }
+.pc.is-leaving .pc__closed { animation: carry 4.3s linear both; }
+@keyframes carry {
+  0%, 17% { opacity: 0; transform: translate(calc(-50% + 440px), -50%) scale(.93); }
+  20% { opacity: 1; transform: translate(calc(-50% + 440px), -50%) scale(.93); animation-timing-function: cubic-bezier(.4, 0, .2, 1); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  76% { opacity: 1; transform: translate(-50%, -50%) scale(1); animation-timing-function: cubic-bezier(.5, 0, .8, .4); }
+  100% { opacity: 1; transform: translate(-50%, calc(-50% + 120vh)) scale(1); }
+}
+.pc.is-leaving .pc__body { animation: spinOut 4.3s linear both; }
+@keyframes spinOut {
+  /* every frame lists the same functions, so 720deg means two real turns */
+  0%, 31% { transform: translateY(0) rotateY(0deg) scale(1); }
+  34% { transform: translateY(-3%) rotateY(-14deg) scale(1.02); animation-timing-function: cubic-bezier(.45, 0, .25, 1); }
+  62% { transform: translateY(0) rotateY(720deg) scale(.82); animation-timing-function: ease-out; }
+  65% { transform: translateY(0) rotateY(728deg) scale(.82); }
+  68%, 100% { transform: translateY(0) rotateY(720deg) scale(.82); }
+}
+.pc.is-leaving .pc__paw { animation: pawTake 4.3s linear both; }
+@keyframes pawTake {
+  0%, 68% { opacity: 0; transform: translateY(80vh); }
+  69% { opacity: 1; transform: translateY(80vh); animation-timing-function: cubic-bezier(.2, .7, .3, 1); }
+  75% { opacity: 1; transform: translateY(-2%); }
+  78% { opacity: 1; transform: translateY(2%) scale(1.04, .95); }
+  81%, 100% { opacity: 1; transform: translateY(0); }
+}
+.pc.is-leaving .pc__scrim { animation: pcFadeOut .6s ease 3.5s both; }
+.pc.is-leaving .kc { animation: pcFadeOut .3s ease 3.9s both; }
+
+/* Cancel: the cover flips shut and it all fades */
+.pc.is-closing .lid { animation: lidShut .7s cubic-bezier(.55, 0, .2, 1) both; }
+.pc.is-closing .pc__open { pointer-events: none; }
+.pc.is-closing.is-folded .pc__open { animation: fadeAway .35s ease both; }
+.pc.is-closing .pc__scrim { animation: pcFadeOut .4s ease .7s both; }

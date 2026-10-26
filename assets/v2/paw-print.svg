@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-24 -24 48 48">
+  <defs>
+    <!-- a kitten's paw: a chubby three-lobed pad and four round beans close around it -->
+    <g id="p">
+      <path d="M0-1.5C9.5-1.5 14.5 6 14.5 11c0 5-3.8 7.5-7.2 7.5-2.7 0-4.2-1.7-7.3-1.7s-4.6 1.7-7.3 1.7C-10.7 18.5-14.5 16-14.5 11c0-5 5-12.5 14.5-12.5z"/>
+      <ellipse cx="-13.6" cy="-6.2" rx="4.6" ry="5.4" transform="rotate(-24 -13.6 -6.2)"/>
+      <ellipse cx="-5.3" cy="-12.6" rx="4.8" ry="5.8" transform="rotate(-8 -5.3 -12.6)"/>
+      <ellipse cx="5.3" cy="-12.6" rx="4.8" ry="5.8" transform="rotate(8 5.3 -12.6)"/>
+      <ellipse cx="13.6" cy="-6.2" rx="4.6" ry="5.4" transform="rotate(24 13.6 -6.2)"/>
+    </g>
+  </defs>
+  <g transform="rotate(-16)">
+    <!-- pressed into the plastic: a lit lower lip, then the shadowed hollow -->
+    <use xlink:href="#p" transform="translate(0 .5)" fill="#ffffff" fill-opacity=".07"/>
+    <use xlink:href="#p" fill="#000000" fill-opacity=".24"/>
+  </g>
+</svg>

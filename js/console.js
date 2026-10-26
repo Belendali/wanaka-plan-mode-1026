@@ -139,6 +139,12 @@ const Console = (() => {
         </div>
 
         <div class="pc__open">
+          <div class="lid" id="pcLid">
+          <div class="half half__out" aria-hidden="true">
+            <img class="out__badge" src="${A}badge.png" alt="">
+            <img class="out__word" src="${A}wanaka-engraved.svg" alt="">
+            <img class="out__paw" src="${A}paw-print.svg" alt="">
+          </div>
           <section class="half half--l" id="pcLeft" data-step="plan">
             <div class="plan-l">
               <div class="cover is-generating" id="pcCover">
@@ -169,6 +175,7 @@ const Console = (() => {
               </button>`).join('')}
             </div>
           </section>
+          </div>
 
           <span class="hinge hinge--a"></span><span class="hinge hinge--b"></span>
 
@@ -266,11 +273,13 @@ const Console = (() => {
     if (how === 'approve') {
       // shut, spin, and the paw takes it away — with the keychain back on while it is shut
       pc.classList.add('is-leaving');
-      at(380, () => Keychain.start(host));
-      at(3500, then);
+      at(720, () => pc.classList.add('is-folded'));
+      at(800, () => Keychain.start(host));
+      at(4300, then);
     } else {
       pc.classList.add('is-closing');
-      at(450, then);
+      at(720, () => pc.classList.add('is-folded'));
+      at(1100, then);
     }
   };
 
@@ -287,7 +296,8 @@ const Console = (() => {
 
     // the paw brings it up, then it opens and the cover starts generating
     Keychain.start(host);
-    at(2700, () => { $('#pc').classList.add('is-open'); Keychain.stop(); generate(); });
+    at(2700, () => { $('#pc').classList.add('is-open'); Keychain.stop(); });
+    at(3900, () => generate());
 
     $('#pcRegen').onclick = () => { state.regens += 1; generate({ fail: state.regens === 2 }); };
     $('#pcRetry').onclick = () => generate();
