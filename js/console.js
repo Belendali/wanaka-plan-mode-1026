@@ -75,7 +75,6 @@ const Console = (() => {
 
         <div class="pc__closed" aria-hidden="true">
           <div class="pc__body">
-            <img class="pc__lid" src="${A}lid-closed.png" alt="">
             <div class="half pc__face"><img class="out__badge" src="${A}badge.png" alt="">
               <img class="out__word" src="${A}wanaka-engraved.svg" alt=""><img class="out__paw" src="${A}paw-print.svg" alt=""></div>
             <div class="pc__under"><span class="under__vents">${'<i></i>'.repeat(7)}</span>
@@ -330,7 +329,7 @@ const Console = (() => {
     state.unfit = () => removeEventListener('resize', fit);
 
     // the paw brings it up, then it opens and the cover starts generating
-    at(2700, () => $('#pc').classList.add('is-open'));
+    at(2450, () => $('#pc').classList.add('is-open'));
 
     $('#pcRegen').onclick = () => { state.regens += 1; generate({ fail: state.regens === 2 }); };
     $('#pcRetry').onclick = () => generate();
