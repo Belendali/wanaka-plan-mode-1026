@@ -56,7 +56,9 @@ const Console = (() => {
   const Keychain = (() => {
     const TAGS = [['tag-v2-1', .524, .115, .998], ['tag-v2-2', .482, .119, .973], ['tag-v2-3', .488, .118, .996],
       ['tag-v2-4', .473, .113, .981], ['tag-v2-5', .489, .116, 1.002]];
-    const L = 74, W = 112, G = 2600, DAMP = 3.2, MAX = .85, PUSH = .45;   // chain length, charm width (stage px), gravity, damping, max swing (rad), how much the console's motion throws it
+    const L = 74, W = 112, G = 2600, DAMP = 3.2, MAX = .85, FLING = 1.4, IN = .22, PUSH = .45, R = 451;
+    // chain length, charm width (stage px), gravity, damping, max swing / max when flung by a turn / most it can swing in (rad),
+    // how much the console's motion throws it, and how far the eyelet sits from the axis it turns on
     let raf = 0, el = null;
     const markup = () => {
       const [name, hx, hy, ar] = TAGS[Math.floor(Math.random() * TAGS.length)];
@@ -75,26 +77,40 @@ const Console = (() => {
     const pivot = (body, box) => {
       const mb = new DOMMatrix(getComputedStyle(body).transform === 'none' ? undefined : getComputedStyle(body).transform);
       const mc = new DOMMatrix(getComputedStyle(box).transform === 'none' ? undefined : getComputedStyle(box).transform);
-      return { flat: mb.is2D, ang: Math.atan2(mb.b, mb.a), m: mc.multiply(mb) };
+      return { flat: mb.is2D, ang: Math.atan2(mb.b, mb.a), turn: Math.atan2(-mb.m13, mb.m11), m: mc.multiply(mb) };
     };
     const start = (root, swing = 0) => {
       cancelAnimationFrame(raf);
       el = root.querySelector('.kc');
       const body = root.querySelector('.pc__body'), box = root.querySelector('.pc__closed');
       if (!el || !body) return;
-      let th = swing, w = 0, last = 0, p0 = null, v0 = null, local = -swing;
+      let th = swing, w = 0, last = 0, p0 = null, v0 = null, local = -swing, turn0 = null, spin = 0;
+      const swingBy = (ax, ay, dt, max) => {   // one step of the pendulum under gravity and a push (ax, ay)
+        w += ((-ax * Math.cos(th) - (G - ay) * Math.sin(th)) / L - DAMP * w) * dt;
+        th += w * dt;
+        if (th > max) { th = max; if (w > 0) w = 0; }        // at the limit it stops, it doesn't keep winding up
+        if (th < -IN) { th = -IN; if (w < 0) w *= -.35; }   // the console's side stops it swinging in
+      };
       const tick = (t) => {
         const dt = Math.min(.033, last ? (t - last) / 1000 : .016); last = t;
-        const { flat, ang, m } = pivot(body, box);
+        const { flat, ang, turn, m } = pivot(body, box);
         if (flat) {
           const p = { x: m.e, y: m.f };   // pivot motion is dominated by the console's translation
           const v = p0 ? { x: (p.x - p0.x) / dt, y: (p.y - p0.y) / dt } : { x: 0, y: 0 };
           const a = v0 ? { x: (v.x - v0.x) / dt, y: (v.y - v0.y) / dt } : { x: 0, y: 0 };
-          const ax = PUSH * Math.max(-6000, Math.min(6000, a.x)), ay = PUSH * Math.max(-6000, Math.min(6000, a.y));
-          w += ((-ax * Math.cos(th) - (G - ay) * Math.sin(th)) / L - DAMP * w) * dt;
-          th = Math.max(-MAX, Math.min(MAX, th + w * dt));
-          p0 = p; v0 = v;
+          swingBy(PUSH * Math.max(-6000, Math.min(6000, a.x)), PUSH * Math.max(-6000, Math.min(6000, a.y)), dt, Math.max(MAX, Math.abs(th)));
+          p0 = p; v0 = v; turn0 = null; spin = 0;
           local = -th - ang;   // CSS turns clockwise, θ counts toward +x; the console's own tilt is undone so it hangs true
+        } else {
+          // turning on its upright axis: the spin flings the charm outward, away from the axis
+          if (turn0 !== null) {
+            let d = turn - turn0;
+            if (d > Math.PI) d -= 2 * Math.PI; else if (d < -Math.PI) d += 2 * Math.PI;
+            spin += (d / dt - spin) * .35;   // smoothed angular speed
+          }
+          turn0 = turn; p0 = null; v0 = null;
+          swingBy(-spin * spin * R, 0, dt, FLING);   // outward is +x in the console's own frame
+          local = -th;
         }
         el.style.transform = `rotate(${local}rad)`;
         raf = requestAnimationFrame(tick);
